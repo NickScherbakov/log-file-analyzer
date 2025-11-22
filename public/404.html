@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found · Log Analyzer</title>
+  <style>
+    body { font-family: Inter, system-ui, sans-serif; margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; background:#0f172a; color:#f1f5f9; }
+    .box { text-align:center; padding:2rem 2.25rem; max-width:480px; }
+    h1 { font-size:1.75rem; margin:0 0 0.75rem; }
+    p { margin:0.5rem 0 1rem; font-size:0.9rem; line-height:1.4; color:#94a3b8; }
+    a { color:#818cf8; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .fade { animation: fade 0.4s ease-in; }
+    @keyframes fade { from { opacity:0; transform: translateY(6px);} to { opacity:1; transform: translateY(0);} }
+  </style>
+</head>
+<body>
+  <div class="box fade">
+    <h1>404 — Страница не найдена</h1>
+    <p>Мы не нашли запрошенный путь. Сейчас будет выполнен возврат на главную страницу приложения.</p>
+    <p><a id="homeLink" href="#">Вернуться вручную</a></p>
+    <p style="font-size:0.7rem; opacity:0.7;">Авто-перенаправление через <span id="count">3</span> сек.</p>
+  </div>
+  <script>
+    (function(){
+      const host = location.hostname;
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      let base = '/';
+      // Если GitHub Pages проект: host заканчивается на github.io и есть первый сегмент.
+      if (/github\.io$/.test(host) && pathParts.length > 0) {
+        base = '/' + pathParts[0] + '/';
+      }
+      document.getElementById('homeLink').href = base;
+      let sec = 3;
+      const counterEl = document.getElementById('count');
+      const interval = setInterval(()=>{ sec--; counterEl.textContent = sec; if(sec<=0){ clearInterval(interval); location.replace(base); } },1000);
+    })();
+  </script>
+</body>
+</html>

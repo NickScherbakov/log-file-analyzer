@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Deep Space / Nebula Theme */
+    --background: 240 30% 6%; /* Very dark blue/black */
+    --foreground: 210 40% 98%;
+
+    --card: 240 25% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 25% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 270 100% 60%; /* Electric Purple */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 240 20% 15%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 240 20% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 190 100% 50%; /* Cyan */
+    --accent-foreground: 240 30% 10%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 20% 20%;
+    --input: 240 20% 20%;
+    --ring: 270 100% 60%;
+
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 240 30% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 240 25% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 25% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 270 100% 60%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 240 20% 15%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 240 20% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 190 100% 50%;
+    --accent-foreground: 240 30% 10%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 20% 20%;
+    --input: 240 20% 20%;
+    --ring: 270 100% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl;
+}
+
+.glass-card {
+  @apply bg-card/40 backdrop-blur-md border border-white/10 shadow-lg hover:bg-card/50 transition-all duration-300;
+}

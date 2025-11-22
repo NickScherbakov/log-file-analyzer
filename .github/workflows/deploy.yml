@@ -1,0 +1,81 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Аналитика: приоритет переменных, затем секреты.
+      VITE_PLAUSIBLE_DOMAIN: ${{ vars.VITE_PLAUSIBLE_DOMAIN || secrets.VITE_PLAUSIBLE_DOMAIN }}
+      VITE_GA_ID: ${{ vars.VITE_GA_ID || secrets.VITE_GA_ID }}
+      VITE_YM_ID: ${{ vars.VITE_YM_ID || secrets.VITE_YM_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine base path
+        id: base
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY##*/}"
+          OWNER="${GITHUB_REPOSITORY%/*}"
+          if [[ "$REPO_NAME" == "$OWNER.github.io" ]]; then
+            echo "base=/" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=/$REPO_NAME/" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build
+        env:
+          GH_PAGES_BASE: ${{ steps.base.outputs.base }}
+          VITE_PLAUSIBLE_DOMAIN: ${{ env.VITE_PLAUSIBLE_DOMAIN }}
+          VITE_GA_ID: ${{ env.VITE_GA_ID }}
+          VITE_YM_ID: ${{ env.VITE_YM_ID }}
+        run: |
+          npm run build
+          echo "Using base: $GH_PAGES_BASE"
+
+      - name: Production check
+        env:
+          GH_PAGES_BASE: ${{ steps.base.outputs.base }}
+          VITE_PLAUSIBLE_DOMAIN: ${{ env.VITE_PLAUSIBLE_DOMAIN }}
+          VITE_GA_ID: ${{ env.VITE_GA_ID }}
+          VITE_YM_ID: ${{ env.VITE_YM_ID }}
+        run: npm run prod:check
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
