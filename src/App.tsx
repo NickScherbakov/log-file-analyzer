@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { FileUpload } from '@/components/FileUpload'
+import { LandingPage } from '@/components/LandingPage'
 import { StatsOverview } from '@/components/StatsOverview'
 import { ErrorFrequencyTable } from '@/components/ErrorFrequencyTable'
 import { TimelineChart } from '@/components/TimelineChart'
@@ -20,6 +21,7 @@ function App() {
   const [selectedPattern, setSelectedPattern] = useState<ErrorPattern | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [severityFilter, setSeverityFilter] = useState<SeverityLevel | 'ALL'>('ALL')
+  const [showAnalyzer, setShowAnalyzer] = useState(false)
 
   const handleFileSelect = (content: string, name: string) => {
     try {
@@ -64,18 +66,23 @@ function App() {
     setSeverityFilter('ALL')
   }
 
+  if (!showAnalyzer) {
+    return <LandingPage onGetStarted={() => setShowAnalyzer(true)} />
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Toaster />
-      
       <div className="container mx-auto px-4 py-6 max-w-7xl">
-        <header className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight">Log Analyzer</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Upload and analyze log files to identify error patterns and trends
-          </p>
+        <header className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Log Analyzer</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Upload and analyze log files to identify error patterns and trends
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => setShowAnalyzer(false)}>Back to Landing</Button>
         </header>
-
         {logEntries.length === 0 ? (
           <FileUpload onFileSelect={handleFileSelect} />
         ) : (
@@ -87,7 +94,6 @@ function App() {
                 Clear
               </Button>
             </div>
-
             <FilterControls
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
@@ -96,7 +102,6 @@ function App() {
               onClearFilters={handleClearFilters}
               hasActiveFilters={hasActiveFilters}
             />
-
             <Tabs defaultValue="frequency" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="frequency" className="flex items-center gap-2">
@@ -112,18 +117,12 @@ function App() {
                   <span className="hidden sm:inline">Raw Logs</span>
                 </TabsTrigger>
               </TabsList>
-
               <TabsContent value="frequency" className="mt-6">
-                <ErrorFrequencyTable
-                  patterns={errorPatterns}
-                  onPatternClick={setSelectedPattern}
-                />
+                <ErrorFrequencyTable patterns={errorPatterns} onPatternClick={setSelectedPattern} />
               </TabsContent>
-
               <TabsContent value="timeline" className="mt-6">
                 <TimelineChart data={timeSeriesData} />
               </TabsContent>
-
               <TabsContent value="raw" className="mt-6">
                 <RawLogViewer entries={filteredEntries} />
               </TabsContent>
@@ -131,7 +130,6 @@ function App() {
           </div>
         )}
       </div>
-
       <ErrorDetailDialog
         pattern={selectedPattern}
         open={selectedPattern !== null}
